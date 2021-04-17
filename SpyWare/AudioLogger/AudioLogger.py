@@ -33,7 +33,7 @@ from sys import argv
 import wave
 
 
-def config_load() -> None:
+def config_load(filename: str=None) -> None:
 
     """ This function load the config file. """
 
@@ -42,7 +42,9 @@ def config_load() -> None:
     CONFIG = ConfigParser()
     env_conf_file = environ.get("audioSpy.conf")
 
-    if len(argv) == 2:
+    if filename is not None:
+        CONFIG.read(filename)
+    elif len(argv) == 2:
         CONFIG.read(argv[1])
     elif env_conf_file:
         CONFIG.read(env_conf_file)

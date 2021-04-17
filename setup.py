@@ -19,7 +19,7 @@ else:
 setup(
     name = 'SpyWare',
  
-    version = "0.0.1",
+    version = "0.0.2",
     packages = find_packages(include=["SpyWare"]),
     install_requires = packages,
 

@@ -21,7 +21,7 @@
 #    along with this program.  If not, see <https://www.gnu.org/licenses/>.
 ###################
 
-__version__ = "0.0.1"
+__version__ = "0.0.2"
 __all__ = [ "Daemon", "filesSpy", "filesConfig" ]
 
 from .FilesLogger import Daemon, main as filesSpy, config_load as filesConfig
