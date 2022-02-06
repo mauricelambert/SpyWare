@@ -1,5 +1,5 @@
-pyautogui
 opencv-python
 pillow
-pyperclip
+pyautogui
 pynput
+pyperclip

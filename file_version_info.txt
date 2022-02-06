@@ -1,0 +1,31 @@
+# UTF-8
+#
+
+VSVersionInfo(
+  ffi=FixedFileInfo(
+    filevers=(1, 0, 0, 0),
+    prodvers=(1, 0, 0, 0),
+    mask=0x3f,
+    flags=0x0,
+    OS=0x4,
+    fileType=0x1,
+    subtype=0x0,
+    date=(0, 0)
+    ),
+  kids=[
+    StringFileInfo(
+      [
+      StringTable(
+        u'000004b0',
+        [StringStruct(u'CompanyName', u'MauriceLambert'),
+        StringStruct(u'FileDescription', u'This executable implements a complete spyware.'),
+        StringStruct(u'FileVersion', u'1.0.0'),
+        StringStruct(u'InternalName', u'SpyWare'),
+        StringStruct(u'LegalCopyright', u'SpyWare  Copyright (C) 2021, 2022  Maurice Lambert'),
+        StringStruct(u'OriginalFilename', u'SpyWare.exe'),
+        StringStruct(u'ProductName', u'SpyWare'),
+        StringStruct(u'ProductVersion', u'1.0.0')])
+      ]), 
+    VarFileInfo([VarStruct(u'Translation', [0, 1200])])
+  ]
+)

