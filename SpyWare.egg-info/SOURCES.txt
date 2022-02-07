@@ -8,8 +8,6 @@ PyAudio-0.2.11-cp39-cp39-win32.whl
 PyAudio-0.2.11-cp39-cp39-win_amd64.whl
 README.md
 SpyWare.ico
-SpyWare_onedir.spec
-SpyWare_onefile.spec
 compilateur.bat
 compile.bat
 file_version_info.txt

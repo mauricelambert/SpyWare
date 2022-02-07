@@ -304,7 +304,9 @@ modules:
 ## Links
 
  - [Github Page](https://github.com/mauricelambert/SpyWare)
- - [Documentation](https://mauricelambert.github.io/info/python/security/SpyWare.html)
+ - [Windows Executable (one file)](https://github.com/mauricelambert/SpyWare/releases/download/v1.0.0/SpyWare.exe)
+ - [Windows Executable](https://github.com/mauricelambert/SpyWare/releases/download/v1.0.0/SpyWare.zip)
+ - [Documentation](https://mauricelambert.github.io/info/python/security/SpyWare/SpyWare.html)
  - [Documentation Clipboard](https://mauricelambert.github.io/info/python/security/SpyWare/ClipboardLogger.html)
  - [Documentation Screenshot](https://mauricelambert.github.io/info/python/security/SpyWare/ScreenLogger.html)
  - [Documentation Domains](https://mauricelambert.github.io/info/python/security/SpyWare/DomainsLogger.html)

@@ -1,6 +1,6 @@
 Metadata-Version: 2.1
 Name: SpyWare
-Version: 1.0.0
+Version: 1.0.1
 Summary: This package implements a complete SpyWare.
 Home-page: https://github.com/mauricelambert/SpyWare
 Author: Maurice Lambert
@@ -8,6 +8,24 @@ Author-email: mauricelambert434@gmail.com
 Maintainer: Maurice Lambert
 Maintainer-email: mauricelambert434@gmail.com
 License: GPL-3.0 License
+Project-URL: Windows Executable (one file), https://github.com/mauricelambert/SpyWare/releases/download/v1.0.0/SpyWare.exe
+Project-URL: Windows Executable, https://github.com/mauricelambert/SpyWare/releases/download/v1.0.0/SpyWare.zip
+Project-URL: Documentation, https://mauricelambert.github.io/info/python/security/SpyWare/SpyWare.html
+Project-URL: Documentation Clipboard, https://mauricelambert.github.io/info/python/security/SpyWare/ClipboardLogger.html
+Project-URL: Documentation Screenshot, https://mauricelambert.github.io/info/python/security/SpyWare/ScreenLogger.html
+Project-URL: Documentation Domains, https://mauricelambert.github.io/info/python/security/SpyWare/DomainsLogger.html
+Project-URL: Documentation Recorder, https://mauricelambert.github.io/info/python/security/SpyWare/AudioLogger.html
+Project-URL: Documentation Keylogger, https://mauricelambert.github.io/info/python/security/SpyWare/KeyLogger.html
+Project-URL: Documentation Webcam, https://mauricelambert.github.io/info/python/security/SpyWare/WebcamLogger.html
+Project-URL: Documentation Files, https://mauricelambert.github.io/info/python/security/SpyWare/FilesLogger.html
+Project-URL: Python executable, https://mauricelambert.github.io/info/python/security/SpyWare.pyz
+Project-URL: Clipboard - Python executable, https://mauricelambert.github.io/info/python/security/SpyWare/ClipboardLogger.pyz
+Project-URL: Screenshot - Python executable, https://mauricelambert.github.io/info/python/security/SpyWare/ScreenLogger.pyz
+Project-URL: Domains - Python executable, https://mauricelambert.github.io/info/python/security/SpyWare/DomainsLogger.pyz
+Project-URL: Recorder - Python executable, https://mauricelambert.github.io/info/python/security/SpyWare/AudioLogger.pyz
+Project-URL: Keylogger - Python executable, https://mauricelambert.github.io/info/python/security/SpyWare/Keylogger.pyz
+Project-URL: Webcam - Python executable, https://mauricelambert.github.io/info/python/security/SpyWare/WebcamLogger.pyz
+Project-URL: Files - Python executable, https://mauricelambert.github.io/info/python/security/SpyWare/FilesLogger.pyz
 Keywords: KeyLogger,SpyWare,WebCam,ClibBoard,DNS Cache,Screen,Recorder,Files,Spy
 Platform: Windows
 Platform: Linux
@@ -332,7 +350,9 @@ modules:
 ## Links
 
  - [Github Page](https://github.com/mauricelambert/SpyWare)
- - [Documentation](https://mauricelambert.github.io/info/python/security/SpyWare.html)
+ - [Windows Executable (one file)](https://github.com/mauricelambert/SpyWare/releases/download/v1.0.0/SpyWare.exe)
+ - [Windows Executable](https://github.com/mauricelambert/SpyWare/releases/download/v1.0.0/SpyWare.zip)
+ - [Documentation](https://mauricelambert.github.io/info/python/security/SpyWare/SpyWare.html)
  - [Documentation Clipboard](https://mauricelambert.github.io/info/python/security/SpyWare/ClipboardLogger.html)
  - [Documentation Screenshot](https://mauricelambert.github.io/info/python/security/SpyWare/ScreenLogger.html)
  - [Documentation Domains](https://mauricelambert.github.io/info/python/security/SpyWare/DomainsLogger.html)

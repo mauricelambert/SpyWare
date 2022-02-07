@@ -50,7 +50,7 @@ class PostInstallScript(install):
 
 setup(
     name="SpyWare",
-    version="1.0.0",
+    version="1.0.1",
     packages=find_packages(include=["SpyWare"]),
     install_requires=[
         "pyautogui",
@@ -68,6 +68,26 @@ setup(
     long_description_content_type="text/markdown",
     include_package_data=True,
     url="https://github.com/mauricelambert/SpyWare",
+    project_urls={
+        "Windows Executable (one file)": "https://github.com/mauricelambert/SpyWare/releases/download/v1.0.0/SpyWare.exe",
+        "Windows Executable": "https://github.com/mauricelambert/SpyWare/releases/download/v1.0.0/SpyWare.zip",
+        "Documentation": "https://mauricelambert.github.io/info/python/security/SpyWare/SpyWare.html",
+        "Documentation Clipboard": "https://mauricelambert.github.io/info/python/security/SpyWare/ClipboardLogger.html",
+        "Documentation Screenshot": "https://mauricelambert.github.io/info/python/security/SpyWare/ScreenLogger.html",
+        "Documentation Domains": "https://mauricelambert.github.io/info/python/security/SpyWare/DomainsLogger.html",
+        "Documentation Recorder": "https://mauricelambert.github.io/info/python/security/SpyWare/AudioLogger.html",
+        "Documentation Keylogger": "https://mauricelambert.github.io/info/python/security/SpyWare/KeyLogger.html",
+        "Documentation Webcam": "https://mauricelambert.github.io/info/python/security/SpyWare/WebcamLogger.html",
+        "Documentation Files": "https://mauricelambert.github.io/info/python/security/SpyWare/FilesLogger.html",
+        "Python executable": "https://mauricelambert.github.io/info/python/security/SpyWare.pyz",
+        "Clipboard - Python executable": "https://mauricelambert.github.io/info/python/security/SpyWare/ClipboardLogger.pyz",
+        "Screenshot - Python executable": "https://mauricelambert.github.io/info/python/security/SpyWare/ScreenLogger.pyz",
+        "Domains - Python executable": "https://mauricelambert.github.io/info/python/security/SpyWare/DomainsLogger.pyz",
+        "Recorder - Python executable": "https://mauricelambert.github.io/info/python/security/SpyWare/AudioLogger.pyz",
+        "Keylogger - Python executable": "https://mauricelambert.github.io/info/python/security/SpyWare/Keylogger.pyz",
+        "Webcam - Python executable": "https://mauricelambert.github.io/info/python/security/SpyWare/WebcamLogger.pyz",
+        "Files - Python executable": "https://mauricelambert.github.io/info/python/security/SpyWare/FilesLogger.pyz",
+    },
     classifiers=[
         "Programming Language :: Python",
         "Development Status :: 5 - Production/Stable",
