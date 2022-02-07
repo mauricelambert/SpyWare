@@ -50,7 +50,7 @@ class PostInstallScript(install):
 
 setup(
     name="SpyWare",
-    version="1.0.1",
+    version="1.0.2",
     packages=find_packages(include=["SpyWare"]),
     install_requires=[
         "pyautogui",
@@ -84,7 +84,7 @@ setup(
         "Screenshot - Python executable": "https://mauricelambert.github.io/info/python/security/SpyWare/ScreenLogger.pyz",
         "Domains - Python executable": "https://mauricelambert.github.io/info/python/security/SpyWare/DomainsLogger.pyz",
         "Recorder - Python executable": "https://mauricelambert.github.io/info/python/security/SpyWare/AudioLogger.pyz",
-        "Keylogger - Python executable": "https://mauricelambert.github.io/info/python/security/SpyWare/Keylogger.pyz",
+        "Keylogger - Python executable": "https://mauricelambert.github.io/info/python/security/SpyWare/KeyLogger.pyz",
         "Webcam - Python executable": "https://mauricelambert.github.io/info/python/security/SpyWare/WebcamLogger.pyz",
         "Files - Python executable": "https://mauricelambert.github.io/info/python/security/SpyWare/FilesLogger.pyz",
     },

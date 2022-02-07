@@ -1,6 +1,6 @@
 Metadata-Version: 2.1
 Name: SpyWare
-Version: 1.0.1
+Version: 1.0.2
 Summary: This package implements a complete SpyWare.
 Home-page: https://github.com/mauricelambert/SpyWare
 Author: Maurice Lambert
@@ -23,7 +23,7 @@ Project-URL: Clipboard - Python executable, https://mauricelambert.github.io/inf
 Project-URL: Screenshot - Python executable, https://mauricelambert.github.io/info/python/security/SpyWare/ScreenLogger.pyz
 Project-URL: Domains - Python executable, https://mauricelambert.github.io/info/python/security/SpyWare/DomainsLogger.pyz
 Project-URL: Recorder - Python executable, https://mauricelambert.github.io/info/python/security/SpyWare/AudioLogger.pyz
-Project-URL: Keylogger - Python executable, https://mauricelambert.github.io/info/python/security/SpyWare/Keylogger.pyz
+Project-URL: Keylogger - Python executable, https://mauricelambert.github.io/info/python/security/SpyWare/KeyLogger.pyz
 Project-URL: Webcam - Python executable, https://mauricelambert.github.io/info/python/security/SpyWare/WebcamLogger.pyz
 Project-URL: Files - Python executable, https://mauricelambert.github.io/info/python/security/SpyWare/FilesLogger.pyz
 Keywords: KeyLogger,SpyWare,WebCam,ClibBoard,DNS Cache,Screen,Recorder,Files,Spy
@@ -365,7 +365,7 @@ modules:
  - [Download Screenshot as python executable](https://mauricelambert.github.io/info/python/security/SpyWare/ScreenLogger.pyz)
  - [Download Domains as python executable](https://mauricelambert.github.io/info/python/security/SpyWare/DomainsLogger.pyz)
  - [Download Recorder as python executable](https://mauricelambert.github.io/info/python/security/SpyWare/AudioLogger.pyz)
- - [Download Keylogger as python executable](https://mauricelambert.github.io/info/python/security/SpyWare/Keylogger.pyz)
+ - [Download Keylogger as python executable](https://mauricelambert.github.io/info/python/security/SpyWare/KeyLogger.pyz)
  - [Download Webcam as python executable](https://mauricelambert.github.io/info/python/security/SpyWare/WebcamLogger.pyz)
  - [Download Files as python executable](https://mauricelambert.github.io/info/python/security/SpyWare/FilesLogger.pyz)
  - [Pypi package](https://pypi.org/project/SpyWare/)
