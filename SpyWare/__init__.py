@@ -3,7 +3,7 @@
 
 ###################
 #    This file implements a complete spyware.
-#    Copyright (C) 2021, 2022  Maurice Lambert
+#    Copyright (C) 2021, 2022, 2023  Maurice Lambert
 
 #    This program is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
@@ -23,7 +23,7 @@
 This file implements a complete spyware.
 """
 
-__version__ = "1.0.2"
+__version__ = "1.0.3"
 __author__ = "Maurice Lambert"
 __author_email__ = "mauricelambert434@gmail.com"
 __maintainer__ = "Maurice Lambert"
@@ -35,7 +35,7 @@ license = "GPL-3.0 License"
 __url__ = "https://github.com/mauricelambert/SpyWare"
 
 copyright = """
-SpyWare  Copyright (C) 2021, 2022  Maurice Lambert
+SpyWare  Copyright (C) 2021, 2022, 2023  Maurice Lambert
 This program comes with ABSOLUTELY NO WARRANTY.
 This is free software, and you are welcome to redistribute it
 under certain conditions.
@@ -45,7 +45,7 @@ __copyright__ = copyright
 
 __all__ = [
     "AudioLogger",
-    "CopyLogger",
+    "ClipboardLogger",
     "DomainsLogger",
     "FilesLogger",
     "KeyLogger",
@@ -56,7 +56,7 @@ __all__ = [
 
 try:
     import AudioLogger
-    import CopyLogger
+    import ClipboardLogger
     import DomainsLogger
     import FilesLogger
     import KeyLogger
@@ -65,7 +65,7 @@ try:
     from SpyWare import main as spyware
 except ImportError:
     from . import AudioLogger
-    from . import CopyLogger
+    from . import ClipboardLogger
     from . import DomainsLogger
     from . import FilesLogger
     from . import KeyLogger

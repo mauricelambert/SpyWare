@@ -50,7 +50,7 @@ class PostInstallScript(install):
 
 setup(
     name="SpyWare",
-    version="1.0.2",
+    version="1.0.3",
     packages=find_packages(include=["SpyWare"]),
     install_requires=[
         "pyautogui",
