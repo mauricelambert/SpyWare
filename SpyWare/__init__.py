@@ -23,7 +23,7 @@
 This file implements a complete spyware.
 """
 
-__version__ = "1.0.4"
+__version__ = "1.0.5"
 __author__ = "Maurice Lambert"
 __author_email__ = "mauricelambert434@gmail.com"
 __maintainer__ = "Maurice Lambert"

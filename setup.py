@@ -5,6 +5,14 @@ from os import system as exec_command
 from platform import system
 
 
+packages = [
+    "pyautogui",
+    "opencv-python",
+    "pillow",
+    "pyperclip",
+    "pynput",
+]
+
 class PostInstallScript(install):
 
     """
@@ -50,15 +58,9 @@ class PostInstallScript(install):
 
 setup(
     name="SpyWare",
-    version="1.0.4",
+    version="1.0.5",
     packages=find_packages(include=["SpyWare"]),
-    install_requires=[
-        "pyautogui",
-        "opencv-python",
-        "pillow",
-        "pyperclip",
-        "pynput",
-    ],
+    install_requires=packages,
     author="Maurice Lambert",
     author_email="mauricelambert434@gmail.com",
     maintainer="Maurice Lambert",
