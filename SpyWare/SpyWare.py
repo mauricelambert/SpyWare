@@ -3,7 +3,7 @@
 
 ###################
 #    This file implements a complete spyware.
-#    Copyright (C) 2021, 2022, 2023  Maurice Lambert
+#    Copyright (C) 2021, 2022, 2023, 2024  Maurice Lambert
 
 #    This program is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
@@ -23,7 +23,7 @@
 This file implements a complete spyware.
 """
 
-__version__ = "1.0.4"
+__version__ = "1.0.6"
 __author__ = "Maurice Lambert"
 __author_email__ = "mauricelambert434@gmail.com"
 __maintainer__ = "Maurice Lambert"
@@ -35,7 +35,7 @@ license = "GPL-3.0 License"
 __url__ = "https://github.com/mauricelambert/SpyWare"
 
 copyright = """
-SpyWare  Copyright (C) 2021, 2022, 2023  Maurice Lambert
+SpyWare  Copyright (C) 2021, 2022, 2023, 2024  Maurice Lambert
 This program comes with ABSOLUTELY NO WARRANTY.
 This is free software, and you are welcome to redistribute it
 under certain conditions.

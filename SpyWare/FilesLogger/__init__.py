@@ -3,7 +3,7 @@
 
 ###################
 #    This file gets all filenames and metadata.
-#    Copyright (C) 2021, 2022  Maurice Lambert
+#    Copyright (C) 2021, 2022, 2024  Maurice Lambert
 
 #    This program is free software: you can redistribute it and/or modify
 #    it under the terms of the GNU General Public License as published by
@@ -32,7 +32,7 @@ This file gets all filenames and metadata.
 >>> filesSpy(argv=["FilesLogger.py", "filesSpy.conf"]) # (using argv)
 """
 
-__version__ = "1.0.0"
+__version__ = "1.0.1"
 __author__ = "Maurice Lambert"
 __author_email__ = "mauricelambert434@gmail.com"
 __maintainer__ = "Maurice Lambert"
